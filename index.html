@@ -1,0 +1,2443 @@
+<!DOCTYPE html>
+<html lang="cs" class="scroll-smooth bg-[#050505]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Matchball — svět reklamy, velkoplošného tisku, finalizace a instalací.">
+    <meta name="theme-color" content="#10100f">
+    <title>Matchball — svět reklamy</title>
+    
+    <!-- Editorial display type, paired with Inter for readable body text. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Inter:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        syne: ['Syne', 'sans-serif'],
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        electric: '#dc6032',
+                        void: '#050505',
+                        glass: 'rgba(255,255,255,0.03)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        html {
+            overflow-x: clip;
+        }
+
+        section[id], footer[id], .service-panel[id] {
+            scroll-margin-top: 6.5rem;
+        }
+
+        #top {
+            scroll-margin-top: 0;
+        }
+
+        .scroll-progress {
+            position: fixed;
+            inset: 0 0 auto;
+            z-index: 60;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            pointer-events: none;
+        }
+
+        .scroll-progress span {
+            display: block;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(0);
+            transform-origin: left center;
+            background: linear-gradient(90deg, var(--orange), #f0a27f);
+            box-shadow: 0 0 14px rgba(var(--orange-rgb), 0.7);
+            transition: transform 0.12s linear;
+        }
+
+        /* UTILITIES & ANIMATIONS */
+        body {
+            overflow-x: clip;
+            background-color: #050505;
+            color: #e0e0e0;
+        }
+
+        ::selection {
+            background: var(--orange);
+            color: #050505;
+        }
+
+        /* Marquee Animation */
+        .marquee-container {
+            display: flex;
+            width: 200%;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* Scroll Reveal (Intersection Observer) */
+        .reveal {
+            opacity: 1;
+            transform: none;
+            transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                        transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: none;
+        }
+
+        .service-section-heading {
+            max-width: 1150px;
+            margin: 0 auto 2rem;
+        }
+
+        .service-section-eyebrow,
+        .service-panel-index {
+            color: var(--orange);
+            font-family: 'Syne', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .service-section-title {
+            margin-top: 0.75rem;
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.8rem, 7vw, 6rem);
+            font-weight: 800;
+            letter-spacing: -0.07em;
+            line-height: 0.95;
+        }
+
+        .service-section-title span {
+            color: var(--orange);
+        }
+
+        .service-experience {
+            display: grid;
+            grid-template-columns: minmax(15rem, 0.72fr) minmax(0, 1.6fr);
+            width: 100%;
+            max-width: 1150px;
+            margin: 0 auto;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1.5rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.012));
+            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.35);
+        }
+
+        .service-tabs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 0;
+            padding: 1rem;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.018);
+        }
+
+        .service-panels,
+        .service-tab {
+            min-width: 0;
+        }
+
+        .service-tab {
+            position: relative;
+            display: grid;
+            grid-template-columns: 3.25rem minmax(0, 1fr) 1.25rem;
+            align-items: center;
+            gap: 0.75rem;
+            width: 100%;
+            min-height: 5.25rem;
+            padding: 0.9rem 0.8rem;
+            border: 1px solid transparent;
+            border-radius: 0.85rem;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.58);
+            text-align: left;
+            transition: color 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+        }
+
+        .service-tab:hover,
+        .service-tab[aria-selected="true"] {
+            border-color: rgba(var(--orange-rgb), 0.22);
+            background: linear-gradient(100deg, rgba(var(--orange-rgb), 0.14), rgba(var(--orange-rgb), 0.015));
+            color: #fff;
+        }
+
+        .service-tab[aria-selected="true"]::before {
+            position: absolute;
+            top: 0.75rem;
+            bottom: 0.75rem;
+            left: -1rem;
+            width: 2px;
+            background: var(--orange);
+            content: "";
+        }
+
+        .service-tab:focus-visible {
+            outline: 2px solid #ff8750;
+            outline-offset: 3px;
+        }
+
+        .service-tab-index {
+            color: var(--orange);
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: -0.06em;
+        }
+
+        .service-tab-label {
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 700;
+            line-height: 1.25;
+        }
+
+        .service-tab-arrow {
+            color: var(--orange);
+            font-size: 1.25rem;
+            opacity: 0;
+            transform: translateX(-0.3rem);
+            transition: opacity 0.25s ease, transform 0.25s ease;
+        }
+
+        .service-tab[aria-selected="true"] .service-tab-arrow {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .service-panel {
+            position: relative;
+            min-width: 0;
+            min-height: 38rem;
+            overflow: hidden;
+            padding: clamp(2rem, 5vw, 4.5rem);
+            isolation: isolate;
+        }
+
+        .service-panel[hidden] {
+            display: none;
+        }
+
+        .service-panel::before {
+            position: absolute;
+            z-index: -1;
+            top: -0.22em;
+            right: -0.04em;
+            color: rgba(255, 255, 255, 0.025);
+            content: attr(data-number);
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(12rem, 26vw, 25rem);
+            font-weight: 800;
+            letter-spacing: -0.1em;
+            line-height: 1;
+            pointer-events: none;
+        }
+
+        .service-panel.is-active {
+            animation: service-panel-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .service-panel.is-active::before {
+            animation: service-number-enter 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .service-panel.is-active .service-panel-index {
+            animation: service-content-enter 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+        }
+
+        .service-panel.is-active h3 {
+            animation: service-content-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+        }
+
+        .service-panel.is-active .service-lead {
+            animation: service-content-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.16s both;
+        }
+
+        .service-panel.is-active .service-feature-layout,
+        .service-panel.is-active .service-body,
+        .service-panel.is-active .service-materials {
+            animation: service-content-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) 0.22s both;
+        }
+
+        @keyframes service-panel-enter {
+            from { opacity: 0; transform: translateY(1.25rem) scale(0.985); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        @keyframes service-content-enter {
+            from { opacity: 0; transform: translateY(0.8rem); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes service-number-enter {
+            from { opacity: 0; transform: translateY(-1.5rem) scale(0.92); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .service-panel-content {
+            position: relative;
+            z-index: 1;
+            max-width: 56rem;
+        }
+
+        .service-panel-index {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-panel-index::after {
+            width: 3rem;
+            height: 1px;
+            background: rgba(var(--orange-rgb), 0.7);
+            content: "";
+        }
+
+        .service-panel h3 {
+            margin-bottom: 1.25rem;
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(2.8rem, 6vw, 5.25rem);
+            font-weight: 800;
+            letter-spacing: -0.075em;
+            line-height: 0.95;
+        }
+
+        .service-lead {
+            max-width: 44rem;
+            margin-bottom: 1.5rem;
+            padding-left: 1rem;
+            border-left: 2px solid var(--orange);
+            color: #fff;
+            font-size: clamp(1rem, 1.8vw, 1.25rem);
+            font-weight: 500;
+            line-height: 1.55;
+        }
+
+        .service-body {
+            max-width: 68ch;
+            color: rgba(255, 255, 255, 0.68);
+            font-size: 0.92rem;
+            line-height: 1.8;
+        }
+
+        .service-feature-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.9fr);
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .service-equipment {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.55rem;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .service-equipment li {
+            padding: 0.45rem 0.7rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.035);
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .service-materials {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .service-materials span {
+            padding: 0.45rem 0.75rem;
+            border: 1px solid rgba(var(--orange-rgb), 0.22);
+            border-radius: 999px;
+            background: rgba(var(--orange-rgb), 0.08);
+            color: #d99272;
+            font-size: 0.78rem;
+        }
+
+        /* Custom Cursor Styling */
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--orange);
+            border-radius: 50%;
+            position: fixed;
+            top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s linear;
+        }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(var(--orange-rgb), 0.5);
+            border-radius: 50%;
+            position: fixed;
+            top: 0; left: 0;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 9998;
+            transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+        }
+        /* Cursor Expansion on Hover */
+        .cursor-hover .cursor-outline {
+            width: 80px;
+            height: 80px;
+            background: rgba(var(--orange-rgb), 0.1);
+            border-color: var(--orange);
+        }
+        
+        /* Background Glows */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            z-index: -1;
+            opacity: 0.4;
+        }
+
+        /* Mobile layout for the service selector */
+        @media (max-width: 768px) {
+            .service-experience { grid-template-columns: 1fr; }
+            .service-tabs {
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                border-right: 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            }
+            .service-tab {
+                grid-template-columns: 2.25rem minmax(0, 1fr);
+                min-height: 4.25rem;
+                gap: 0.5rem;
+                padding: 0.7rem;
+            }
+            .service-tab-index { font-size: 1.1rem; }
+            .service-tab-label { font-size: 0.82rem; }
+            .service-tab-arrow { display: none; }
+            .service-tab[aria-selected="true"]::before {
+                top: auto;
+                right: 0.75rem;
+                bottom: -1rem;
+                left: 0.75rem;
+                width: auto;
+                height: 2px;
+            }
+            .service-panel { min-height: 0; }
+            .service-panel h3 { font-size: clamp(2.25rem, 8vw, 3rem); }
+            .service-panel::before { font-size: 12rem; }
+            .glow-orb { display: none; }
+            .service-feature-layout { grid-template-columns: 1fr; gap: 1.5rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            html.scroll-smooth { scroll-behavior: auto; }
+            .marquee-container { animation: none; }
+            .reveal,
+            .reveal.active {
+                opacity: 1;
+                transform: none;
+                filter: none;
+                transition: none;
+            }
+            .service-panel.is-active,
+            .service-panel.is-active::before,
+            .service-panel.is-active .service-panel-index,
+            .service-panel.is-active h3,
+            .service-panel.is-active .service-lead,
+            .service-panel.is-active .service-feature-layout,
+            .service-panel.is-active .service-body,
+            .service-panel.is-active .service-materials {
+                animation: none;
+            }
+            .scroll-progress span { transition: none; }
+        }
+
+        :root {
+            color-scheme: dark;
+            --ink: #10100f;
+            --paper: #f2efe8;
+            --paper-bright: #fffdf8;
+            --orange: #dc6032;
+            --orange-rgb: 220, 96, 50;
+            --muted-ink: #66625b;
+        }
+
+        body.site-body {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        #top .hero-title,
+        .service-section-title,
+        .service-panel h3,
+        #about h2,
+        .contact-intro h2 {
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+        }
+
+        .site-nav .site-logo {
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+            font-size: clamp(1.4rem, 4vw, 1.9rem);
+            font-weight: 700;
+            letter-spacing: -0.04em;
+        }
+
+        .reveal {
+            transition:
+                opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .motion-ready .reveal:not(.active) {
+            opacity: 0;
+            transform: translateY(2.5rem);
+        }
+
+        .reveal.active {
+            transform: translateY(0);
+        }
+
+        .scroll-progress {
+            height: 3px;
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .site-nav {
+            padding: 1rem clamp(1rem, 4vw, 3.5rem);
+            border-bottom-color: rgba(255, 255, 255, 0.12);
+            background: rgba(16, 16, 15, 0.96);
+        }
+
+        .site-nav-inner {
+            max-width: 1440px;
+            min-height: 3.25rem;
+        }
+
+        .site-logo {
+            font-size: 1.7rem;
+            letter-spacing: -0.08em;
+        }
+
+        .site-nav-links {
+            gap: clamp(1rem, 3vw, 2.5rem);
+            font-size: 0.72rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .site-nav-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.8rem 1rem;
+            border: 1px solid rgba(var(--orange-rgb), 0.6);
+            border-radius: 999px;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+        }
+
+        .site-nav-cta span {
+            color: var(--orange);
+            font-size: 1rem;
+            transition: transform 0.25s ease;
+        }
+
+        .site-nav-cta:hover {
+            border-color: var(--orange);
+            background: var(--orange);
+            color: var(--ink);
+        }
+
+        .site-nav-cta:hover span {
+            color: inherit;
+            transform: translate(2px, -2px);
+        }
+
+        #top {
+            min-height: max(760px, 100svh);
+            padding: 8rem clamp(1.25rem, 6vw, 6rem) 10rem;
+            background:
+                radial-gradient(ellipse at 82% 55%, rgba(220, 96, 50, 0.09), transparent 28rem),
+                linear-gradient(135deg, #111211 0%, #1a1b1b 100%);
+            isolation: isolate;
+        }
+
+        #top::before {
+            position: absolute;
+            inset: 5.5rem clamp(1.25rem, 4vw, 3.5rem) 7rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            content: "";
+            pointer-events: none;
+        }
+
+        #top .hero-copy {
+            position: relative;
+            z-index: 3;
+            width: min(100%, 1300px);
+            margin: 0 auto;
+        }
+
+        #top .hero-kicker {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: clamp(1.5rem, 4vw, 3rem);
+            color: rgba(255, 160, 112, 0.82);
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.28em;
+            text-transform: uppercase;
+        }
+
+        #top .hero-kicker::before {
+            width: 2rem;
+            height: 1px;
+            background: var(--orange);
+            content: "";
+        }
+
+        #top .hero-title {
+            max-width: 13ch;
+            font-size: clamp(3.5rem, 7.6vw, 7.8rem);
+            font-weight: 700;
+            letter-spacing: -0.035em;
+            line-height: 0.82;
+        }
+
+        #top .hero-title span {
+            display: inline-block;
+            margin-top: 0.12em;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(242, 239, 232, 0.52);
+            transition: color 0.45s ease, -webkit-text-stroke-color 0.45s ease;
+        }
+
+        #top .hero-title span:hover {
+            color: var(--orange);
+            -webkit-text-stroke-color: var(--orange);
+        }
+
+        .hero-bottom {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 2rem;
+            width: min(100%, 1300px);
+            margin: clamp(2rem, 5vw, 4rem) auto 0;
+        }
+
+        .hero-description {
+            max-width: 26rem;
+            color: rgba(240, 237, 229, 0.68);
+            font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+            line-height: 1.7;
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .hero-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.9rem;
+            padding: 0.85rem 1.1rem;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 999px;
+            color: #fff;
+            font-size: 0.78rem;
+            font-weight: 600;
+            transition: border-color 0.25s ease, background 0.25s ease, color 0.25s ease;
+        }
+
+        .hero-link-primary {
+            border-color: var(--orange);
+            background: var(--orange);
+            color: var(--ink);
+        }
+
+        .hero-link:hover {
+            border-color: var(--orange);
+            background: var(--orange);
+            color: var(--ink);
+        }
+
+        .hero-link span {
+            font-size: 1rem;
+            transition: transform 0.25s ease;
+        }
+
+        .hero-link:hover span {
+            transform: translate(2px, -2px);
+        }
+
+        .hero-scroll {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: rgba(240, 237, 229, 0.58);
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+        }
+
+        .hero-scroll::before {
+            width: 2.5rem;
+            height: 1px;
+            background: var(--orange);
+            content: "";
+        }
+
+        .hero-graphic {
+            position: absolute;
+            z-index: 1;
+            top: 50%;
+            right: clamp(1.5rem, 6vw, 6rem);
+            width: clamp(15rem, 32vw, 30rem);
+            aspect-ratio: 1;
+            border: 1px solid rgba(var(--orange-rgb), 0.32);
+            border-radius: 50%;
+            transform: translateY(-42%);
+            pointer-events: none;
+        }
+
+        .hero-graphic::before,
+        .hero-graphic::after {
+            position: absolute;
+            inset: 7%;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 50%;
+            content: "";
+        }
+
+        .hero-graphic::after {
+            inset: 18%;
+            border-color: rgba(var(--orange-rgb), 0.22);
+        }
+
+        .hero-graphic-core {
+            position: absolute;
+            inset: 29%;
+            display: grid;
+            place-items: center;
+            overflow: hidden;
+            border-radius: 50%;
+            background:
+                repeating-radial-gradient(circle at center, transparent 0 7px, rgba(16, 16, 15, 0.13) 8px 9px),
+                var(--orange);
+            box-shadow: 0 0 70px rgba(var(--orange-rgb), 0.14);
+            animation: hero-counter-orbit 24s linear infinite;
+        }
+
+        .hero-graphic-core::after {
+            width: 14%;
+            aspect-ratio: 1;
+            border: 1px solid rgba(16, 16, 15, 0.45);
+            border-radius: 50%;
+            background: var(--ink);
+            content: "";
+        }
+
+        .hero-graphic-label {
+            position: absolute;
+            right: -1.5rem;
+            bottom: 17%;
+            padding: 0.65rem 0.8rem;
+            background: rgba(240, 237, 229, 0.9);
+            color: var(--ink);
+            font-family: 'Syne', sans-serif;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            transform: rotate(-8deg);
+        }
+
+        /* A small, art-directed showcase built from CSS so the page works
+           without pretending these concept visuals are client photographs. */
+        .work-section {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(5rem, 10vw, 9rem) clamp(1.25rem, 6vw, 6rem);
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        .work-inner { width: min(100%, 1300px); margin: 0 auto; }
+        .work-heading { display: flex; align-items: end; justify-content: space-between; gap: 2rem; margin-bottom: 2.5rem; }
+        .work-kicker { color: #9c482d; font-size: .68rem; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+        .work-title { max-width: 12ch; margin-top: .8rem; font-family: 'Barlow Condensed', sans-serif; font-size: clamp(3rem, 7vw, 6.5rem); font-weight: 700; letter-spacing: -.045em; line-height: .9; }
+        .work-intro { max-width: 24rem; padding-bottom: .35rem; color: #615d56; font-size: .95rem; line-height: 1.7; }
+        .work-grid { display: grid; grid-template-columns: 1.15fr .85fr; grid-template-rows: 17rem 17rem; gap: 1rem; }
+        .work-card { position: relative; display: flex; min-width: 0; flex-direction: column; justify-content: space-between; overflow: hidden; padding: 1.25rem; background: #d9d4cb; isolation: isolate; }
+        .work-card:first-child { grid-row: span 2; min-height: 35rem; }
+        .work-card-meta { position: relative; z-index: 2; display: flex; justify-content: space-between; color: rgba(16,16,15,.68); font-size: .62rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+        .work-card-caption { position: relative; z-index: 2; display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
+        .work-card-caption h3 { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(1.8rem, 3vw, 2.7rem); font-weight: 700; letter-spacing: -.025em; line-height: .95; }
+        .work-card-caption p { max-width: 14rem; margin-top: .45rem; color: rgba(16,16,15,.68); font-size: .78rem; line-height: 1.5; }
+        .work-arrow { display: grid; width: 2.6rem; height: 2.6rem; flex: 0 0 auto; place-items: center; border: 1px solid rgba(16,16,15,.35); border-radius: 50%; font-size: 1.15rem; }
+        .work-art { position: absolute; z-index: -1; inset: 0; overflow: hidden; }
+        .work-art--print { background: radial-gradient(ellipse at 75% 22%, rgba(255,255,255,.9), transparent 28%), linear-gradient(145deg,#d9d4cb 0 36%,#ef6b3c 36% 67%,#b54427 67%); }
+        .print-sheet { position: absolute; top: 12%; right: 12%; width: 53%; height: 65%; padding: 1rem; background: #f6f1e6; box-shadow: 1.2rem 1.5rem 3rem rgba(25,18,14,.24); transform: rotate(7deg); }
+        .print-sheet::before { position:absolute; inset: 9%; content:""; background: linear-gradient(160deg,transparent 0 30%,#dc6032 30% 35%,transparent 35%), radial-gradient(ellipse at 60% 42%,#252522 0 13%,transparent 14%), linear-gradient(135deg,#dad2c1,#b6c5bd); }
+        .print-sheet::after { position:absolute; right:12%; bottom:12%; width:31%; height:3px; content:""; background:#dc6032; }
+        .print-mark { position:absolute; top:16%; left:15%; color:#171715; font-family:'Barlow Condensed',sans-serif; font-size:clamp(2.5rem,6vw,6rem); font-weight:800; line-height:.75; transform:rotate(-8deg); }
+        .work-art--vehicle { background: linear-gradient(145deg,#d5d0c5,#9b998f); }
+        .vehicle-shadow { position:absolute; right:5%; bottom:20%; left:9%; height:14%; border-radius:50%; background:rgba(20,20,18,.25); filter:blur(12px); }
+        .vehicle-shape { position:absolute; right:5%; bottom:25%; left:9%; height:37%; border-radius:38% 20% 10% 10% / 45% 45% 16% 16%; background:linear-gradient(165deg,#f6f2e9 0 43%,#dc6032 43% 72%,#222321 72%); box-shadow:0 1rem 2rem rgba(0,0,0,.15); }
+        .vehicle-shape::before { position:absolute; top:-42%; left:27%; width:45%; height:60%; border-radius:70% 40% 0 0; content:""; background:linear-gradient(120deg,#262a2a,#667172 60%,#242626); clip-path:polygon(14% 100%,32% 0,77% 0,100% 100%); }
+        .vehicle-shape::after { position:absolute; right:8%; bottom:-15%; left:8%; height:38%; content:""; background:radial-gradient(circle at 16% 50%,#1b1c1b 0 12%,#9c9b94 13% 18%,transparent 19%),radial-gradient(circle at 82% 50%,#1b1c1b 0 12%,#9c9b94 13% 18%,transparent 19%); }
+        .work-art--install { background:linear-gradient(120deg,#303331,#161817); }
+        .install-wall { position:absolute; top:10%; right:13%; bottom:17%; left:13%; border:1px solid rgba(255,255,255,.2); background:linear-gradient(90deg,transparent 49.7%,rgba(255,255,255,.12) 50%,transparent 50.3%),linear-gradient(0deg,transparent 49.7%,rgba(255,255,255,.12) 50%,transparent 50.3%),linear-gradient(135deg,#3b413e,#202422); box-shadow:0 1rem 3rem rgba(0,0,0,.35); }
+        .install-sign { position:absolute; top:26%; left:20%; display:grid; width:60%; height:42%; place-items:center; border:5px solid #f2efe8; background:var(--orange); color:#171715; font-family:'Barlow Condensed',sans-serif; font-size:clamp(2rem,4vw,4rem); font-weight:800; letter-spacing:-.05em; transform:perspective(500px) rotateY(-8deg); box-shadow:0 1rem 2rem rgba(0,0,0,.35); }
+
+        @media (max-width: 768px) {
+            .work-heading { align-items: start; flex-direction: column; gap: 1rem; }
+            .work-grid { grid-template-columns: 1fr 1fr; grid-template-rows: 22rem 17rem; gap: .65rem; }
+            .work-card:first-child { grid-column: 1 / -1; grid-row: auto; min-height: 0; }
+            .work-card { padding: .9rem; }
+            .work-card-caption { align-items: start; }
+            .work-card-caption p { font-size: .7rem; }
+            .work-arrow { width: 2rem; height: 2rem; }
+        }
+
+        @media (max-width: 420px) {
+            .work-grid { grid-template-columns: 1fr; grid-template-rows: 19rem 16rem 16rem; }
+            .work-card:first-child { grid-column: auto; }
+            .work-card-caption h3 { font-size: 1.9rem; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .work-card { scroll-behavior: auto; }
+        }
+
+
+
+        @keyframes hero-counter-orbit {
+            to { transform: rotate(-360deg); }
+        }
+
+        .marquee-strip {
+            bottom: 2rem;
+            z-index: 4;
+            width: calc(100% + 2rem);
+            margin-left: -1rem;
+            padding: 0.5rem 0;
+            background: #713e2c;
+            transform: rotate(-0.6deg);
+        }
+
+        .marquee-strip .marquee-container {
+            width: max-content;
+            color: var(--paper-bright);
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+            font-size: clamp(1.05rem, 2.7vw, 2.25rem);
+            font-weight: 700;
+            animation-duration: 28s;
+        }
+
+        .marquee-container span {
+            padding-right: 1.5rem;
+        }
+
+        #services {
+            padding: clamp(5rem, 10vw, 9rem) clamp(1.25rem, 6vw, 6rem);
+            border-top: 0;
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        .service-section-heading {
+            margin-bottom: clamp(2rem, 5vw, 4rem);
+        }
+
+        .service-section-eyebrow,
+        .service-panel-index {
+            color: #d94300;
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+        }
+
+        .service-section-title {
+            font-size: clamp(3rem, 7vw, 6.25rem);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .service-experience {
+            max-width: 1300px;
+            border: 1px solid rgba(16, 16, 15, 0.16);
+            border-radius: 1rem;
+            background: var(--paper-bright);
+            box-shadow: 0 2rem 5rem rgba(16, 16, 15, 0.1);
+        }
+
+        .service-tabs {
+            gap: 0.35rem;
+            padding: clamp(0.75rem, 2vw, 1.25rem);
+            border-right-color: rgba(255, 255, 255, 0.1);
+            background: #181715;
+        }
+
+        .service-tab {
+            min-height: 5rem;
+            border-radius: 0.65rem;
+            color: rgba(255, 255, 255, 0.58);
+        }
+
+        .service-tab:hover,
+        .service-tab[aria-selected="true"] {
+            border-color: rgba(var(--orange-rgb), 0.32);
+            background: linear-gradient(100deg, rgba(var(--orange-rgb), 0.2), rgba(var(--orange-rgb), 0.04));
+            color: #fff;
+        }
+
+        .service-tab[aria-selected="true"]::before {
+            left: calc(clamp(0.75rem, 2vw, 1.25rem) * -1);
+        }
+
+        .service-panel {
+            color: var(--ink);
+            background:
+                radial-gradient(circle at 100% 0, rgba(var(--orange-rgb), 0.07), transparent 22rem),
+                var(--paper-bright);
+        }
+
+        .service-panel::before {
+            color: rgba(16, 16, 15, 0.045);
+        }
+
+        .service-panel-index {
+            color: #d94300;
+        }
+
+        .service-panel h3 {
+            color: var(--ink);
+            font-size: clamp(2.55rem, 5vw, 4.25rem);
+        }
+
+        .service-lead {
+            border-left-color: var(--orange);
+            color: #25231f;
+        }
+
+        .service-body {
+            color: var(--muted-ink);
+        }
+
+        .service-equipment li {
+            border-color: rgba(16, 16, 15, 0.14);
+            background: rgba(16, 16, 15, 0.035);
+            color: #393630;
+        }
+
+        .service-materials span {
+            border-color: rgba(217, 67, 0, 0.22);
+            background: rgba(var(--orange-rgb), 0.08);
+            color: #bf3d00;
+        }
+
+        #about {
+            position: relative;
+            overflow: hidden;
+            padding: clamp(5rem, 12vw, 11rem) clamp(1.25rem, 6vw, 6rem);
+            background:
+                radial-gradient(ellipse at 100% 50%, rgba(220, 96, 50, 0.08), transparent 35rem),
+                var(--paper);
+            color: var(--ink);
+        }
+
+        #about::before {
+            position: absolute;
+            top: 5%;
+            right: -6rem;
+            width: clamp(14rem, 30vw, 30rem);
+            aspect-ratio: 1;
+            border: 1px solid rgba(16, 16, 15, 0.14);
+            border-radius: 50%;
+            box-shadow: 0 0 0 2rem rgba(16, 16, 15, 0.025), 0 0 0 4rem rgba(16, 16, 15, 0.02);
+            content: "";
+            pointer-events: none;
+        }
+
+        #about .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1300px;
+        }
+
+        .about-kicker {
+            color: #a64e2a;
+            font-size: 0.75rem;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+        }
+
+        #about h2 {
+            max-width: 16ch;
+            font-size: clamp(2.6rem, 6vw, 5.8rem);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            line-height: 0.97;
+        }
+
+        #about h2 span {
+            color: #b94f28;
+        }
+
+        #about .grid {
+            max-width: 62rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(16, 16, 15, 0.18);
+        }
+
+        #about .grid p {
+            color: rgba(16, 16, 15, 0.68);
+            font-size: clamp(0.98rem, 1.5vw, 1.12rem);
+            line-height: 1.85;
+        }
+
+        #about .grid p:last-child {
+            color: var(--ink);
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+            font-size: clamp(1.5rem, 3vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: -0.015em;
+            line-height: 1.2;
+        }
+
+        #project-digitalizace {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 2rem 0 0;
+            border-top-color: rgba(16, 16, 15, 0.18);
+        }
+
+        #project-digitalizace > a {
+            max-width: 38ch;
+            color: var(--ink);
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+            font-size: clamp(1.1rem, 2.5vw, 2rem);
+            font-weight: 700;
+            letter-spacing: 0.015em;
+            line-height: 1.2;
+        }
+
+        #project-digitalizace p {
+            margin: 0;
+        }
+
+        #project-digitalizace p a {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.85rem 1rem;
+            border: 1px solid rgba(16, 16, 15, 0.32);
+            border-radius: 999px;
+            color: var(--ink);
+            font-size: 0.8rem;
+            transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+        }
+
+        #project-digitalizace p a:hover {
+            border-color: var(--ink);
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        #project-digitalizace p a::after {
+            content: "↗";
+        }
+
+        #contact {
+            padding: clamp(5rem, 10vw, 9rem) clamp(1.25rem, 6vw, 6rem) 2rem;
+            border-top: 0;
+            background:
+                radial-gradient(ellipse at 100% 0, rgba(220, 96, 50, 0.08), transparent 30rem),
+                #111211;
+        }
+
+        .contact-inner {
+            max-width: 1300px;
+        }
+
+        .contact-intro {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: clamp(3rem, 8vw, 6rem);
+        }
+
+        .contact-intro p {
+            margin-bottom: 1rem;
+            color: #ff8750;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.24em;
+            text-transform: uppercase;
+        }
+
+        .contact-intro h2 {
+            max-width: 10ch;
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+            font-size: clamp(3rem, 6.7vw, 6.8rem);
+            font-weight: 800;
+            letter-spacing: -0.025em;
+            line-height: 0.86;
+        }
+
+        .contact-intro h2 span {
+            color: var(--orange);
+        }
+
+        .contact-intro-link {
+            display: inline-flex;
+            flex: 0 0 auto;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 1.2rem;
+            border-radius: 999px;
+            background: var(--orange);
+            color: var(--ink);
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: transform 0.25s ease;
+        }
+
+        .contact-intro-link:hover {
+            transform: translateY(-3px);
+        }
+
+        #contact .contact-grid {
+            margin-bottom: clamp(3rem, 7vw, 5rem);
+        }
+
+        #contact .contact-card {
+            padding: clamp(1.4rem, 2.5vw, 2.2rem);
+            border: 1px solid rgba(242, 239, 232, 0.16);
+            border-radius: 0.35rem;
+            background: rgba(242, 239, 232, 0.035);
+        }
+
+        #contact .contact-card h3 {
+            min-height: 3.5rem;
+            color: #d99272;
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 600;
+            line-height: 1.6;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        #contact .contact-card a {
+            transition: color 0.2s ease;
+        }
+
+        #contact .contact-card a:hover {
+            color: var(--orange);
+        }
+
+        #contact .contact-person > p:first-child {
+            font-family: 'Barlow Condensed', 'Syne', sans-serif;
+            font-size: 1.45rem;
+            letter-spacing: 0.005em;
+        }
+
+        #contact .contact-card .contact-person {
+            margin-top: 1.3rem;
+        }
+
+        #contact .contact-bottom {
+            padding-top: 1.5rem;
+            border-top-color: rgba(255, 255, 255, 0.14);
+        }
+
+        #contact .contact-bottom nav a {
+            transition: color 0.2s ease;
+        }
+
+        #contact .facebook-link > span:first-child {
+            border-color: rgba(var(--orange-rgb), 0.5);
+            color: var(--orange);
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        #contact .facebook-link:hover > span:first-child {
+            background: var(--orange);
+            color: var(--ink);
+        }
+
+        a:focus-visible,
+        button:focus-visible {
+            outline: 2px solid #ff8750;
+            outline-offset: 4px;
+        }
+
+        @media (max-width: 768px) {
+            #top {
+                min-height: max(700px, 100svh);
+                padding: 8rem 1.25rem 9rem;
+            }
+
+            #top::before {
+                inset: 5.5rem 0.75rem 6rem;
+            }
+
+            #top .hero-title {
+                font-size: clamp(3.2rem, 8vw, 5.25rem);
+            }
+
+            .hero-graphic {
+                top: auto;
+                right: 0.75rem;
+                bottom: 5.5rem;
+                width: min(45vw, 15rem);
+                opacity: 0.38;
+                transform: none;
+            }
+
+            .hero-graphic-label {
+                right: 0;
+                font-size: 0.48rem;
+            }
+
+            .hero-bottom {
+                align-items: start;
+                flex-direction: column;
+                gap: 1.25rem;
+                margin-top: 2rem;
+            }
+
+            .hero-description {
+                max-width: 22rem;
+                font-size: 0.95rem;
+            }
+
+            .hero-scroll {
+                display: none;
+            }
+
+            .marquee-strip {
+                bottom: 1.5rem;
+            }
+
+            .marquee-strip .marquee-container {
+                font-size: 1.3rem;
+            }
+
+            .service-panel {
+                padding: 2rem 1.4rem;
+            }
+
+            .service-panel h3 {
+                font-size: clamp(1.5rem, 7.3vw, 2.4rem);
+            }
+
+            #project-digitalizace {
+                grid-template-columns: 1fr;
+                align-items: start;
+            }
+
+            .contact-intro {
+                align-items: start;
+                flex-direction: column;
+            }
+
+            #contact .contact-card h3 {
+                min-height: 0;
+            }
+        }
+
+        @media (max-width: 420px) {
+            .site-logo {
+                font-size: 1.4rem;
+            }
+
+            .service-tab {
+                grid-template-columns: 1.25rem minmax(0, 1fr);
+                gap: 0.3rem;
+                min-height: 3.75rem;
+                padding: 0.6rem 0.5rem;
+            }
+
+            .service-tab-index {
+                font-size: 0.85rem;
+            }
+
+            .service-tab-label {
+                font-size: 0.65rem;
+            }
+
+            .site-nav-cta {
+                gap: 0.45rem;
+                padding: 0.7rem 0.8rem;
+                font-size: 0.65rem;
+            }
+
+            #top .hero-title {
+                font-size: clamp(2.7rem, 10vw, 3.2rem);
+            }
+
+            .hero-actions {
+                gap: 0.5rem;
+            }
+
+            .hero-link {
+                padding: 0.75rem 0.9rem;
+                font-size: 0.72rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .hero-graphic,
+            .hero-graphic-core {
+                animation: none;
+            }
+
+            .reveal,
+            .reveal.active {
+                opacity: 1;
+                transform: none;
+                filter: none;
+                transition: none;
+            }
+        }
+
+        .page-wipe {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: grid;
+            place-items: center;
+            background: var(--orange);
+            color: var(--ink);
+            pointer-events: none;
+            transform: scaleY(0);
+        }
+
+        .page-wipe.is-intro {
+            transform: scaleY(1);
+            transform-origin: top;
+            animation: page-wipe-open 0.95s cubic-bezier(0.76, 0, 0.24, 1) 0.15s forwards;
+        }
+
+        .page-wipe.is-covering {
+            transform: scaleY(1);
+            transform-origin: bottom;
+            transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        .page-wipe.is-opening {
+            transform: scaleY(0);
+            transform-origin: top;
+            transition: transform 0.7s cubic-bezier(0.76, 0, 0.24, 1);
+        }
+
+        .page-wipe-wordmark {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(3rem, 10vw, 10rem);
+            font-weight: 800;
+            letter-spacing: -0.1em;
+            line-height: 0.8;
+        }
+
+        .page-wipe-wordmark span {
+            color: var(--paper);
+        }
+
+        @keyframes page-wipe-open {
+            to { transform: scaleY(0); }
+        }
+
+        :root {
+            --service-count: 5;
+            --nav-height: 5.25rem;
+        }
+
+        #services {
+            padding-bottom: 0;
+        }
+
+        .service-scroll-space {
+            position: relative;
+            height: calc(var(--service-count) * 100svh);
+        }
+
+        .service-experience {
+            position: sticky;
+            top: 0;
+            display: block;
+            width: calc(100% + 12vw);
+            height: 100svh;
+            max-width: none;
+            margin: 0 -6vw;
+            overflow: hidden;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+        }
+
+        .service-tabs {
+            position: absolute;
+            z-index: 4;
+            top: clamp(5.75rem, 10vh, 7.5rem);
+            right: clamp(1.25rem, 6vw, 6rem);
+            left: clamp(1.25rem, 6vw, 6rem);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 0.4rem;
+            padding: 0.45rem;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 999px;
+            background: rgba(16, 16, 15, 0.98);
+        }
+
+        .service-tab {
+            grid-template-columns: auto auto auto;
+            justify-content: center;
+            width: auto;
+            min-width: 0;
+            min-height: 3.2rem;
+            flex: 1 1 0;
+            gap: 0.65rem;
+            padding: 0.55rem 0.85rem;
+            border-radius: 999px;
+            color: rgba(255, 255, 255, 0.62);
+            white-space: nowrap;
+        }
+
+        .service-tab[aria-selected="true"]::before {
+            display: none;
+        }
+
+        .service-tab-index {
+            font-size: 0.9rem;
+        }
+
+        .service-tab-label {
+            font-size: 0.78rem;
+        }
+
+        .service-tab-arrow {
+            display: none;
+        }
+
+        .service-panels {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            will-change: transform;
+        }
+
+        .service-panel {
+            --panel-ink: #10100f;
+            --panel-muted: #716e67;
+            --panel-accent: #d94300;
+            --panel-line: rgba(16, 16, 15, 0.16);
+            display: flex;
+            width: 100%;
+            height: 100svh;
+            min-height: 100svh;
+            flex: 0 0 100%;
+            align-items: center;
+            padding: clamp(8rem, 16vh, 11rem) clamp(1.5rem, 8vw, 8rem) 4rem;
+            color: var(--panel-ink);
+            background: var(--paper-bright);
+        }
+
+        .service-panel:nth-child(2) {
+            --panel-ink: #10100f;
+            --panel-muted: rgba(16, 16, 15, 0.72);
+            --panel-accent: #fff3e8;
+            --panel-line: rgba(16, 16, 15, 0.28);
+            background: var(--orange);
+        }
+
+        .service-panel:nth-child(3) {
+            --panel-ink: #f0ede5;
+            --panel-muted: rgba(240, 237, 229, 0.68);
+            --panel-accent: #ff8750;
+            --panel-line: rgba(255, 255, 255, 0.2);
+            background: #191715;
+        }
+
+        .service-panel:nth-child(4) {
+            --panel-ink: #10100f;
+            --panel-muted: #716e67;
+            --panel-accent: #d94300;
+            --panel-line: rgba(16, 16, 15, 0.18);
+            background: #e4ded2;
+        }
+
+        .service-panel:nth-child(5) {
+            --panel-ink: #f0ede5;
+            --panel-muted: rgba(240, 237, 229, 0.68);
+            --panel-accent: #ff8750;
+            --panel-line: rgba(255, 255, 255, 0.18);
+            background: #10100f;
+        }
+
+        .service-panel::before {
+            top: auto;
+            right: 3vw;
+            bottom: -0.18em;
+            color: color-mix(in srgb, var(--panel-ink) 7%, transparent);
+            font-size: clamp(18rem, 45vw, 48rem);
+            line-height: 0.8;
+        }
+
+        .service-panel-content {
+            width: min(100%, 1300px);
+            max-width: 1300px;
+            margin: auto;
+        }
+
+        .service-panel-index {
+            margin-bottom: clamp(1rem, 2vw, 2rem);
+            color: var(--panel-accent);
+        }
+
+        .service-panel-index::after {
+            background: currentColor;
+        }
+
+        .service-panel h3 {
+            max-width: 14ch;
+            margin-bottom: clamp(0.8rem, 2vw, 1.5rem);
+            color: var(--panel-ink);
+            font-size: clamp(3rem, 6.6vw, 6.8rem);
+            line-height: 0.86;
+        }
+
+        .service-lead {
+            max-width: 55ch;
+            margin-bottom: clamp(1rem, 2.5vh, 1.75rem);
+            border-left-color: var(--panel-accent);
+            color: var(--panel-ink);
+            font-size: clamp(1rem, 1.7vw, 1.35rem);
+        }
+
+        .service-body {
+            max-width: 72ch;
+            color: var(--panel-muted);
+            font-size: clamp(0.85rem, 1.05vw, 1rem);
+            line-height: 1.7;
+        }
+
+        .service-feature-layout {
+            grid-template-columns: minmax(0, 1.2fr) minmax(17rem, 0.8fr);
+            gap: clamp(1.5rem, 5vw, 5rem);
+            align-items: start;
+        }
+
+        .service-equipment li {
+            border-color: var(--panel-line);
+            background: color-mix(in srgb, var(--panel-ink) 5%, transparent);
+            color: var(--panel-ink);
+        }
+
+        .service-materials span {
+            border-color: color-mix(in srgb, var(--panel-accent) 45%, transparent);
+            background: color-mix(in srgb, var(--panel-accent) 12%, transparent);
+            color: var(--panel-accent);
+        }
+
+        .service-panel.is-active {
+            animation: service-panel-enter 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @media (max-width: 900px) and (min-width: 769px) {
+            .service-tab {
+                grid-template-columns: auto minmax(0, 1fr);
+                gap: 0.35rem;
+                padding-inline: 0.5rem;
+                white-space: normal;
+            }
+
+            .service-tab-label {
+                font-size: 0.62rem;
+                line-height: 1.05;
+            }
+
+            .service-panel {
+                padding-right: 5vw;
+                padding-left: 5vw;
+            }
+
+            .service-panel h3 {
+                font-size: clamp(3.5rem, 7vw, 5.5rem);
+            }
+
+            .service-feature-layout {
+                grid-template-columns: minmax(0, 1fr) minmax(15rem, 0.8fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            #services {
+                padding: 5rem 1.25rem 4rem;
+            }
+
+            .service-scroll-space {
+                height: auto;
+            }
+
+            .service-experience {
+                position: relative;
+                top: auto;
+                width: auto;
+                height: auto;
+                margin: 0;
+                overflow: visible;
+            }
+
+            .service-tabs {
+                position: static;
+                display: grid;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 0.35rem;
+                margin-bottom: 1rem;
+                padding: 0.6rem;
+                border-radius: 1rem;
+            }
+
+            .service-tab {
+                grid-template-columns: 1.25rem minmax(0, 1fr);
+                justify-content: start;
+                min-height: 3.4rem;
+                gap: 0.35rem;
+                padding: 0.55rem 0.6rem;
+                white-space: normal;
+            }
+
+            .service-tab-label {
+                font-size: 0.72rem;
+                line-height: 1.15;
+            }
+
+            .service-panels {
+                width: auto;
+                height: auto;
+                gap: 1rem;
+                overflow-x: auto;
+                padding: 0.1rem 0.1rem 1rem;
+                scroll-snap-type: x mandatory;
+                scrollbar-width: none;
+                transform: none !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .service-panels::-webkit-scrollbar {
+                display: none;
+            }
+
+            .service-panel {
+                width: min(88vw, 36rem);
+                height: auto;
+                min-height: 70svh;
+                flex: 0 0 min(88vw, 36rem);
+                align-items: start;
+                padding: 5.5rem 1.5rem 2rem;
+                border-radius: 1rem;
+                scroll-snap-align: start;
+            }
+
+            .service-panel::before {
+                right: -0.05em;
+                bottom: -0.05em;
+                font-size: 18rem;
+            }
+
+            .service-panel h3 {
+                font-size: clamp(2rem, 8vw, 3rem);
+            }
+
+            .service-feature-layout {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .page-wipe {
+                display: none;
+            }
+
+            .service-panels {
+                will-change: auto;
+                scroll-behavior: auto;
+            }
+        }
+        body.site-body { background: var(--ink); }
+        .site-nav { padding-block: .8rem; background: rgba(9,9,9,.78); backdrop-filter: blur(18px); }
+        .site-nav-inner { max-width: 1600px; }
+        .site-logo { font-size: 1.6rem; }
+        .site-nav-cta { border-radius: 0; }
+        .site-nav-links { letter-spacing: .18em; }
+
+        #top {
+            min-height: max(820px,100svh);
+            padding: 10rem clamp(1.25rem,7vw,8rem) 8rem;
+            background: var(--orange);
+            color: var(--ink);
+        }
+        #top::before { inset: 5.5rem 2vw 2vw; border: 1px solid rgba(9,9,9,.24); }
+        #top::after {
+            position:absolute; z-index:0; inset:0; pointer-events:none; content:"";
+            background: repeating-linear-gradient(90deg,transparent 0 calc(10vw - 1px),rgba(9,9,9,.055) calc(10vw - 1px) 10vw);
+            mask-image:linear-gradient(90deg,transparent,black 22%,black 82%,transparent);
+        }
+        #top .hero-copy { z-index:3; width:min(100%,1500px); }
+        #top .hero-kicker { color:rgba(9,9,9,.72); font-size:.72rem; letter-spacing:.24em; }
+        #top .hero-kicker::before { background:var(--ink); }
+        #top .hero-title {
+            max-width: 12ch;
+            font-size:clamp(5rem,13.4vw,13rem);
+            font-weight:800;
+            letter-spacing:-.075em;
+            line-height:.72;
+            text-transform:uppercase;
+        }
+        #top .hero-title span {
+            margin-top:.16em;
+            -webkit-text-stroke:2px var(--ink);
+        }
+        #top .hero-title span:hover { color:var(--paper); -webkit-text-stroke-color:var(--paper); }
+        .hero-bottom { margin-top:clamp(2.5rem,7vh,6rem); }
+        .hero-description { max-width:24rem; color:rgba(9,9,9,.76); font-size:clamp(1rem,1.35vw,1.25rem); font-weight:500; }
+        .hero-link { border-color:rgba(9,9,9,.5); color:var(--ink); }
+        .hero-link-primary { border-color:var(--ink); background:var(--ink); color:var(--paper); }
+        .hero-link:hover { border-color:var(--ink); background:var(--ink); color:var(--paper); }
+        .hero-scroll { color:rgba(9,9,9,.7); }
+        .hero-scroll::before { background:var(--ink); }
+        .hero-graphic {
+            top:49%; right:8vw; width:clamp(18rem,35vw,40rem);
+            border:2px solid rgba(9,9,9,.48);
+            box-shadow:0 0 0 2.4rem rgba(9,9,9,.045),0 0 0 4.8rem rgba(9,9,9,.035);
+            animation:hero-drift 9s ease-in-out infinite alternate;
+        }
+        .hero-graphic::before { border:2px solid rgba(9,9,9,.3); }
+        .hero-graphic::after { border:2px solid rgba(9,9,9,.32); }
+        .hero-graphic-core { background:repeating-conic-gradient(from 0deg,#090909 0 3deg,#ff5126 3deg 7deg); box-shadow:0 1rem 4rem rgba(9,9,9,.24); }
+        .hero-graphic-core::after { width:26%; border:0; background:var(--paper); }
+        .hero-graphic-label { right:-2rem; bottom:15%; padding:.8rem 1rem; background:var(--ink); color:var(--paper); font-size:.72rem; transform:rotate(7deg); }
+        @keyframes hero-drift { from { transform:translateY(-46%) rotate(-5deg); } to { transform:translateY(-38%) rotate(5deg); } }
+        .marquee-strip { bottom:1.6rem; background:var(--ink); color:var(--paper); transform:rotate(-1.4deg) scale(1.04); }
+        .marquee-strip .marquee-container { animation-duration:28s; }
+
+        #work.work-scroll-space { position:relative; height:340svh; padding:0; overflow:clip; background:var(--ink); color:var(--paper); }
+        .work-stage { position:sticky; top:0; height:100svh; overflow:hidden; }
+        .work-inner { display:flex; width:100%; max-width:none; height:100%; flex-direction:column; justify-content:space-between; padding:clamp(6rem,10vh,8rem) clamp(1.25rem,6vw,7rem) 3.4rem; }
+        .work-heading { align-items:end; margin:0; }
+        .work-kicker { color:var(--orange); }
+        .work-title { max-width:10ch; color:var(--paper); font-size:clamp(3.5rem,8vw,8rem); line-height:.8; text-transform:uppercase; }
+        .work-intro { max-width:22rem; color:rgba(243,240,231,.7); }
+        .work-viewport { overflow:visible; }
+        .work-grid { display:flex; width:max-content; grid-template-columns:none; grid-template-rows:none; gap:1.4rem; will-change:transform; }
+        .work-card, .work-card:first-child {
+            width:min(68vw,880px); height:54svh; min-height:430px; flex:0 0 min(68vw,880px);
+            padding:clamp(1rem,2vw,1.8rem); color:var(--paper); background:#242321;
+            border:1px solid rgba(243,240,231,.18); border-radius:0; transform:scale(.94); opacity:.55;
+            transition:transform .75s cubic-bezier(.16,1,.3,1), opacity .75s ease, border-color .5s ease;
+        }
+        .work-card.is-current { transform:scale(1); opacity:1; border-color:rgba(255,81,38,.8); }
+        .work-card-meta { color:rgba(243,240,231,.72); }
+        .work-card-caption h3 { font-size:clamp(2.5rem,5vw,5rem); line-height:.82; text-transform:uppercase; }
+        .work-card-caption p { color:rgba(243,240,231,.72); }
+        .work-arrow { border-color:var(--orange); color:var(--orange); }
+        .work-art--print { background:radial-gradient(ellipse at 76% 18%,rgba(255,255,255,.8),transparent 25%),linear-gradient(140deg,#d8d1c2 0 32%,#ff5126 32% 68%,#a52f1e 68%); }
+        .work-card:nth-child(2) .work-art--vehicle { background:linear-gradient(135deg,#1f2524,#707773); }
+        .work-card:nth-child(3) .work-art--install { background:linear-gradient(140deg,#ce3a20,#ff5126 55%,#a82d1a); }
+        .work-progress { display:flex; align-items:center; gap:.8rem; width:min(100%,16rem); color:rgba(243,240,231,.58); font-size:.65rem; letter-spacing:.17em; text-transform:uppercase; }
+        .work-progress-track { height:2px; flex:1; overflow:hidden; background:rgba(243,240,231,.2); }
+        .work-progress-track span { display:block; width:100%; height:100%; background:var(--orange); transform:scaleX(0); transform-origin:left; }
+
+        #services { padding:clamp(4rem,8vh,7rem) 0 0; background:var(--ink); }
+        .service-section-heading { position:absolute; z-index:5; top:1.55rem; left:clamp(1.25rem,6vw,7rem); width:auto; margin:0; color:var(--paper); }
+        .service-section-eyebrow { color:var(--orange); font-size:.68rem; }
+        .service-section-title { font-size:clamp(1.4rem,2.3vw,2.2rem); letter-spacing:-.04em; }
+        .service-section-title span { color:var(--orange); }
+        .service-scroll-space { height:calc(var(--service-count) * 100svh); }
+        .service-experience { width:100%; margin:0; }
+        .service-tabs { top:1.5rem; right:clamp(1.25rem,6vw,7rem); left:auto; width:min(60vw,760px); border-color:rgba(243,240,231,.26); background:rgba(9,9,9,.65); backdrop-filter:blur(16px); }
+        .service-tab { border-radius:0; }
+        .service-tab[aria-selected="true"] { background:var(--orange); color:var(--ink); }
+        .service-tab[aria-selected="true"] .service-tab-index { color:var(--ink); }
+        .service-panel { clip-path:inset(0); }
+        .service-panel::before { right:0; bottom:-.15em; font-size:clamp(24rem,55vw,62rem); color:color-mix(in srgb,var(--panel-ink) 5%,transparent); transform:translateX(calc((1 - var(--service-progress, 0)) * 8vw)); }
+        .service-panel:nth-child(odd) { background:var(--paper-bright); }
+        .service-panel:nth-child(2) {
+            --panel-ink:#090909;
+            --panel-muted:rgba(9,9,9,.76);
+            --panel-accent:#090909;
+            --panel-line:rgba(9,9,9,.24);
+            background:var(--orange);
+        }
+        .service-panel:nth-child(3) { background:#151515; }
+        .service-panel:nth-child(4) { background:#dad4c8; }
+        .service-panel:nth-child(5) {
+            --panel-ink:#090909;
+            --panel-muted:rgba(9,9,9,.76);
+            --panel-accent:#bd3519;
+            --panel-line:rgba(9,9,9,.2);
+            background:#f2eee4;
+        }
+        .service-panel.is-active { animation:service-cinematic-enter .85s cubic-bezier(.16,1,.3,1) both; }
+        @keyframes service-cinematic-enter { from { opacity:.35; clip-path:inset(8% 0 0 8%); } to { opacity:1; clip-path:inset(0); } }
+        .service-panel-index { font-size:.78rem; letter-spacing:.24em; }
+        .service-panel h3 { font-size:clamp(4rem,9vw,10rem); letter-spacing:-.08em; text-transform:uppercase; }
+        .service-lead { max-width:45ch; font-size:clamp(1.1rem,2vw,1.6rem); }
+        .service-body { max-width:60ch; }
+
+        #about { background:var(--paper); }
+        #about::before { border:2px solid rgba(9,9,9,.17); box-shadow:0 0 0 2rem rgba(9,9,9,.035),0 0 0 4rem rgba(9,9,9,.025); }
+        #about h2 { max-width:12ch; font-size:clamp(3.5rem,8vw,8rem); line-height:.84; text-transform:uppercase; }
+        #about h2 span { color:var(--orange); }
+        #about .grid { max-width:75rem; }
+        #about .grid p:last-child { font-size:clamp(2rem,4vw,4rem); }
+        #contact { background:var(--orange); color:var(--ink); }
+        .contact-intro p { color:var(--ink); }
+        .contact-intro h2 { color:var(--ink); font-size:clamp(4rem,9vw,9rem); text-transform:uppercase; }
+        .contact-intro h2 span { color:var(--paper); }
+        .contact-intro-link { border:1px solid var(--ink); border-radius:0; background:var(--ink); color:var(--paper); }
+        #contact .contact-card { border-color:rgba(9,9,9,.28); background:rgba(9,9,9,.05); }
+        #contact .contact-card h3, #contact .contact-card a, #contact .contact-card p { color:var(--ink); }
+        #contact .contact-person > p:first-child { color:var(--ink); }
+        #contact .contact-bottom { border-color:rgba(9,9,9,.3); color:rgba(9,9,9,.68); }
+        #contact .facebook-link > span:first-child { border-color:var(--ink); color:var(--ink); }
+        #contact .facebook-link:hover > span:first-child { background:var(--ink); color:var(--paper); }
+        .scroll-progress span { background:var(--paper); box-shadow:0 0 20px rgba(243,240,231,.6); }
+
+        @media (max-width:900px) {
+            #top .hero-title { font-size:clamp(4.6rem,14vw,8.5rem); }
+            .service-tabs { left:1.25rem; right:1.25rem; width:auto; }
+        }
+        @media (max-width:768px) {
+            #top { min-height:max(760px,100svh); padding-top:9rem; }
+            #top .hero-title { max-width:9ch; font-size:clamp(4rem,16vw,7rem); }
+            #top::before { inset:5.5rem .65rem 5rem; }
+            .hero-graphic { right:-1rem; bottom:6.5rem; width:min(55vw,17rem); opacity:.55; }
+            .hero-graphic-label { right:0; }
+            .marquee-strip { bottom:1.5rem; }
+            #work.work-scroll-space { height:auto; min-height:0; padding:0; }
+            .work-stage { position:relative; height:auto; min-height:100svh; }
+            .work-inner { min-height:100svh; padding:7rem 1.25rem 2rem; }
+            .work-heading { align-items:start; flex-direction:column; gap:1.3rem; margin-bottom:2rem; }
+            .work-title { max-width:9ch; font-size:clamp(3.4rem,13vw,6rem); }
+            .work-viewport { margin-right:-1.25rem; overflow-x:auto; scroll-snap-type:x mandatory; scrollbar-width:none; }
+            .work-viewport::-webkit-scrollbar { display:none; }
+            .work-grid { transform:none!important; padding:0 1.25rem .8rem 0; }
+            .work-card, .work-card:first-child { width:84vw; height:55svh; min-height:390px; flex-basis:84vw; transform:none; opacity:1; scroll-snap-align:start; }
+            .work-card-caption h3 { font-size:clamp(2.3rem,9vw,4rem); }
+            .work-progress { margin-top:1.3rem; }
+            .service-section-heading { position:relative; top:auto; left:auto; margin:0 1.25rem 2rem; }
+            #services { padding-top:4rem; }
+            .service-tabs { position:static; width:auto; margin:0 0 1rem; }
+            .service-scroll-space { height:auto; }
+            .service-panel { clip-path:none; }
+            .service-panel h3 { font-size:clamp(2.8rem,12vw,4.4rem); }
+            #about h2 { font-size:clamp(3rem,12vw,6rem); }
+            .contact-intro h2 { font-size:clamp(4rem,16vw,7rem); }
+        }
+        @media (prefers-reduced-motion:reduce) {
+            .hero-graphic { animation:none; }
+            .work-card, .service-panel { transition:none; animation:none!important; }
+        }
+
+
+        /* MATCHBALL — campaign direction: oversized type, hard color blocks,
+           pinned horizontal storytelling and scroll-linked movement. */
+        :root {
+            --ink: #090909;
+            --paper: #f3f0e7;
+            --paper-bright: #fffdf6;
+            --orange: #ff5126;
+            --orange-rgb: 255, 81, 38;
+        }
+
+    </style>
+</head>
+<body class="site-body antialiased selection:bg-electric selection:text-void relative">
+
+    <div class="scroll-progress" aria-hidden="true"><span id="scroll-progress-bar"></span></div>
+    <div class="page-wipe is-intro" aria-hidden="true"><span class="page-wipe-wordmark">matchball<span>.</span></span></div>
+
+    <!-- NAVIGATION -->
+    <nav class="site-nav fixed top-0 w-full z-50 border-b border-white/5 bg-[#050505]/90 px-6 py-5">
+        <div class="site-nav-inner container mx-auto flex justify-between items-center">
+            <a href="#top" class="site-logo font-syne font-bold text-2xl tracking-tighter text-white hover-target" aria-label="Úvodní stránka matchball">matchball<span class="text-electric">.</span></a>
+            <div class="site-nav-links hidden md:flex font-sans text-sm tracking-widest text-white/70">
+                <a href="#work" class="hover:text-electric transition-colors hover-target">Ukázky</a>
+                <a href="#about" class="hover:text-electric transition-colors hover-target">Proč my</a>
+                <a href="#services" class="hover:text-electric transition-colors hover-target">Technologie</a>
+            </div>
+            <a href="#contact" class="site-nav-cta hover-target">Kontakt <span aria-hidden="true">↗</span></a>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section id="top" class="min-h-screen flex flex-col justify-center relative overflow-hidden">
+        <div class="hero-copy">
+            <p class="hero-kicker font-sans">vítejte ve světě reklamy</p>
+            <h1 class="hero-title font-syne">
+                Reklama,<br>
+                <span class="text-transparent">která je vidět.</span>
+            </h1>
+            <div class="hero-bottom">
+                <div>
+                    <p class="hero-description">Od prvního tisku po poslední montáž. Vymýšlíme, vyrábíme a instalujeme reklamu, kterou nepřehlédnete.</p>
+                    <div class="hero-actions">
+                        <a href="#work" class="hero-link hero-link-primary hover-target">Prohlédnout ukázky <span aria-hidden="true">↘</span></a>
+                        <a href="#contact" class="hero-link hover-target">Spojit se s námi <span aria-hidden="true">↗</span></a>
+                    </div>
+                </div>
+                <a href="#services" class="hero-scroll hover-target">Posuňte se dál</a>
+            </div>
+        </div>
+
+        <div class="hero-graphic" aria-hidden="true">
+            <div class="hero-graphic-core"></div>
+            <span class="hero-graphic-label">Matchball / tisk & reklama</span>
+        </div>
+
+        <!-- INFINITE TEXT MARQUEE -->
+        <div class="marquee-strip absolute w-full overflow-hidden whitespace-nowrap text-void hover-target">
+            <div class="marquee-container font-syne font-bold text-3xl md:text-5xl tracking-wider">
+                <span>Technologie &nbsp;—&nbsp; Finalizace &nbsp;—&nbsp; POS systémy &nbsp;—&nbsp; Aplikace a instalace &nbsp;—&nbsp; Tiskové produkty &nbsp;—&nbsp; </span>
+                <span>Technologie &nbsp;—&nbsp; Finalizace &nbsp;—&nbsp; POS systémy &nbsp;—&nbsp; Aplikace a instalace &nbsp;—&nbsp; Tiskové produkty &nbsp;—&nbsp; </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- PINNED HORIZONTAL SHOWCASE -->
+    <section id="work" class="work-scroll-space" aria-labelledby="work-title">
+        <div class="work-stage">
+            <div class="work-inner">
+                <div class="work-heading">
+                    <div>
+                        <p class="work-kicker">Od nápadu po instalaci / 01—03</p>
+                        <h2 id="work-title" class="work-title">Reklama,<br>která mění prostor.</h2>
+                    </div>
+                    <p class="work-intro">Každý materiál je nové plátno. Projeďte se naším světem tisku, polepů a instalací.</p>
+                </div>
+                <div class="work-viewport">
+                    <div class="work-grid">
+                        <article class="work-card is-current">
+                            <div class="work-art work-art--print" aria-hidden="true"><div class="print-sheet"></div><span class="print-mark">BARVA<br>BEZ<br>LIMITŮ</span></div>
+                            <div class="work-card-meta"><span>01 / Velkoformát</span><span>Print lab</span></div>
+                            <div class="work-card-caption"><div><h3>Tisk, který<br>zastaví pohled.</h3><p>UV tisk. Nekonečné možnosti povrchů.</p></div><span class="work-arrow" aria-hidden="true">↗</span></div>
+                        </article>
+                        <article class="work-card">
+                            <div class="work-art work-art--vehicle" aria-hidden="true"><div class="vehicle-shadow"></div><div class="vehicle-shape"></div></div>
+                            <div class="work-card-meta"><span>02 / Polepy</span><span>Mobilní plocha</span></div>
+                            <div class="work-card-caption"><div><h3>Značka<br>v pohybu.</h3><p>Grafika, která promění každý kilometr ve vaši reklamu.</p></div><span class="work-arrow" aria-hidden="true">↗</span></div>
+                        </article>
+                        <article class="work-card">
+                            <div class="work-art work-art--install" aria-hidden="true"><div class="install-wall"></div><div class="install-sign">VIDĚT.</div></div>
+                            <div class="work-card-meta"><span>03 / Instalace</span><span>Na místě</span></div>
+                            <div class="work-card-caption"><div><h3>Od tisku<br>k prostoru.</h3><p>Výroba a instalace od jednoho týmu. Do posledního detailu.</p></div><span class="work-arrow" aria-hidden="true">↗</span></div>
+                        </article>
+                    </div>
+                </div>
+                <div class="work-progress" aria-label="Průběh galerie"><span>Posouvej dál</span><div class="work-progress-track"><span id="work-progress-value"></span></div><span>03</span></div>
+            </div>
+        </div>
+    </section>
+    <section id="services" class="relative z-10 border-t border-white/5 bg-void/50 px-6 py-24 backdrop-blur-sm">
+        <div class="service-section-heading">
+            <p class="service-section-eyebrow">Matchball / 01—05</p>
+            <h2 class="service-section-title">Naše služby<span>.</span></h2>
+        </div>
+
+        <div class="service-scroll-space" id="service-scroll-space">
+        <div class="service-experience">
+            <div id="service-tabs" class="service-tabs" role="tablist" aria-label="Oblasti služeb">
+                <button id="tab-technologie" class="service-tab" type="button" role="tab" aria-selected="true" aria-controls="panel-technologie" tabindex="0">
+                    <span class="service-tab-index" aria-hidden="true">01</span><span class="service-tab-label">Technologie</span><span class="service-tab-arrow" aria-hidden="true">↗</span>
+                </button>
+                <button id="tab-finalizace" class="service-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-finalizace" tabindex="-1">
+                    <span class="service-tab-index" aria-hidden="true">02</span><span class="service-tab-label">Finalizace</span><span class="service-tab-arrow" aria-hidden="true">↗</span>
+                </button>
+                <button id="tab-pos-systemy" class="service-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-pos-systemy" tabindex="-1">
+                    <span class="service-tab-index" aria-hidden="true">03</span><span class="service-tab-label">POS systémy</span><span class="service-tab-arrow" aria-hidden="true">↗</span>
+                </button>
+                <button id="tab-aplikace" class="service-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-aplikace" tabindex="-1">
+                    <span class="service-tab-index" aria-hidden="true">04</span><span class="service-tab-label">Aplikace a instalace</span><span class="service-tab-arrow" aria-hidden="true">↗</span>
+                </button>
+                <button id="tab-tiskove-produkty" class="service-tab" type="button" role="tab" aria-selected="false" aria-controls="panel-tiskove-produkty" tabindex="-1">
+                    <span class="service-tab-index" aria-hidden="true">05</span><span class="service-tab-label">Tiskové produkty</span><span class="service-tab-arrow" aria-hidden="true">↗</span>
+                </button>
+            </div>
+
+            <div class="service-panels">
+                <article id="panel-technologie" class="service-panel is-active" role="tabpanel" aria-labelledby="tab-technologie" tabindex="0" data-number="01">
+                    <div class="service-panel-content">
+                        <p class="service-panel-index">01 / 05</p>
+                        <h3>Technologie</h3>
+                        <p class="service-lead">Řekneme to stručně. Jsme blázni do technologií.</p>
+                        <div class="service-feature-layout">
+                            <p class="service-body">Zakládáme si na tom, že se u nás v Matchballu tiskne na tom nejlepším, nejrychlejším a nejspolehlivějším, co aktuální tiskařský průmysl nabízí. O své stroje se staráme (a nejenom stroje tiskové), své stroje hýčkáme a když začnou dosluhovat, jsou bez váhání vyměněny za nové. Díky tomu, že se nemusíme polovinu dne otravovat s pruhujícím tiskem nebo ucpanou tiskovou hlavou, můžeme skutečně pracovat, dosahovat vynikajících výsledků a odvádět špičkovou práci. V Matchballu si aktuálně hýčkáme tyto stroje:</p>
+                            <ul class="service-equipment">
+                                <li>Agfa Anapurna M3200i RTR</li>
+                                <li>D-Gen Papyrus G5</li>
+                                <li>2xSumma G3S140/šíře 1400 mm</li>
+                                <li>3xMimaki JV33/šíře 1600 mm</li>
+                                <li>SwissQprint Nyala 4</li>
+                                <li>Mimaki JV300</li>
+                                <li>Zund G3</li>
+                                <li>Canon Colorado Gel UV</li>
+                                <li>3xEpson S80610L</li>
+                            </ul>
+                        </div>
+                    </div>
+                </article>
+
+                <article id="panel-finalizace" class="service-panel" role="tabpanel" aria-labelledby="tab-finalizace" tabindex="0" data-number="02">
+                    <div class="service-panel-content">
+                        <p class="service-panel-index">02 / 05</p>
+                        <h3>Finalizace</h3>
+                        <p class="service-lead">Když komplet, tak komplet. U nás v Matchballu není nic jenom napůl.</p>
+                        <p class="service-body">Chcete kvalitní tisk na materiál, na který si ukážete? Dobře, žádný problém. Ale co dál? Pokud nic, předáme vám zakázku, poděkujeme a budeme se těšit na další návštěvu. Chcete-li ovšem například provést laminaci (papír nebo i fólie), kašírování na PVC nebo něco oříznout či nalepit na sendvičový materiál, stačí se ozvat. Máme bohaté zkušenosti, děláme to dobře, rychle a za dobré ceny.</p>
+                    </div>
+                </article>
+
+                <article id="panel-pos-systemy" class="service-panel" role="tabpanel" aria-labelledby="tab-pos-systemy" tabindex="0" data-number="03">
+                    <div class="service-panel-content">
+                        <p class="service-panel-index">03 / 05</p>
+                        <h3>POS systémy</h3>
+                        <p class="service-lead">Když přijde na POS systémy aneb zdokonalování místa prodeje, neznáme my v Matchballu bratra.</p>
+                        <p class="service-body">Předložíme vám širokou škálu systémů, jež dodáváme komplet. To znamená hezky zabalené a hlavně kvalitně potištěné. Potom stačí pouze roll-up, stand-up, pop-up, áčko nebo muší křídla (vlajky půl-vejčitého tvaru) rozbalit, postavit a nechat působit.</p>
+                    </div>
+                </article>
+
+                <article id="panel-aplikace" class="service-panel" role="tabpanel" aria-labelledby="tab-aplikace" tabindex="0" data-number="04">
+                    <div class="service-panel-content">
+                        <p class="service-panel-index">04 / 05</p>
+                        <h3>Aplikace a instalace</h3>
+                        <p class="service-lead">Když se něco vytiskne, nalepí a doladí, je většinou potřeba to někam pověsit či obecně – nainstalovat.</p>
+                        <p class="service-body">Matchball nabízí svým klientům instalace všeho druhu na všech možných i nemožných místech. Táhnout se s 5 metrovou cedulí na Mont Blanc sice nikdy nebyl náš sen, ale když si to budete přát, jsme na to připraveni. V našem týmu najdete kolegy s posunutým pudem sebezáchovy a hodně odolným žaludkem, takže vám cokoliv pověsíme i v závratných výškách, profesionálně vám polepíme vozový park, fasádu, okna, no zkrátka na cokoliv si ukážete.</p>
+                        <p class="service-body mt-4">A jeden bonus na závěr. V lokalitě Zlín a Uherské Hradiště provádíme denní rozvoz zdarma. Pokud jste z Prahy, Bratislavy, Českých Budějovic, Brna nebo Ostravy a dalších měst, jsme schopni vám cokoliv dopravit v řádech hodin.</p>
+                    </div>
+                </article>
+
+                <article id="panel-tiskove-produkty" class="service-panel" role="tabpanel" aria-labelledby="tab-tiskove-produkty" tabindex="0" data-number="05">
+                    <div class="service-panel-content">
+                        <p class="service-panel-index">05 / 05</p>
+                        <h3>Tiskové produkty</h3>
+                        <p class="service-lead">Ukažte si na cokoliv a my vám to potiskneme (potěší, když vynecháte části vlastního těla).</p>
+                        <p class="service-body">Jestliže se totiž my v Matchballu řídíme nějakým pravidlem, pak že nic není nemožné. Říkala to kdysi i Toyota, ale jenom do té doby, než se v jejich autech začaly zasekávat plynové pedály. Ale zpátky k nám. Nevíme o materiálu, který bychom nedokázali probudit k životu a věřte, že věci k životu probouzet umíme. A ty věci zůstanou živé hodně dlouho. Mezi naše přednosti totiž v tiskové oblasti patří absolutní UV stálost a fotokvalita. Jo, a pedály se nám nezasekávají.</p>
+                        <div class="service-materials"><span>Papír</span><span>PVC, vinyly</span><span>Plachtoviny</span><span>Speciální materiály</span></div>
+                    </div>
+                </article>
+            </div>
+        </div>
+        </div>
+    </section>
+
+    <!-- MANIFESTO / ABOUT -->
+    <section id="about" class="py-32 px-6">
+        <div class="container mx-auto max-w-5xl">
+            <p class="about-kicker font-syne font-bold mb-4 reveal">Proč s Matchballem?</p>
+            <h2 class="font-syne text-5xl md:text-7xl font-bold mb-12 leading-tight reveal">
+                Znáte to, když dva dělají <span class="text-electric italic">totéž</span>, není to totéž.
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 font-sans text-lg text-white/70">
+                <p class="reveal" style="transition-delay: 0.1s;">
+                    Nejsme jediná firma v České republice, která se zabývá velkoplošným tiskem, aplikacemi, nebo polepem aut. Kdo má ruce a nohy, pobral trochu rozumu a peněz, může v tomto oboru začít podnikat taky. Co ovšem odlišuje amatéry od profesionálů je kvalita a výsledky. Na trhu možná najdete firmy s delší tradicí, ale mnohem hůř budete hledat někoho s podobnými referencemi.
+                </p>
+                <p class="reveal" style="transition-delay: 0.2s;">
+                    Ne, my se nechceme chválit, nepotřebujeme to. Chválí nás naši klienti a na tom záleží.
+                </p>
+            </div>
+            <div id="project-digitalizace" class="mt-20 border-t border-white/10 pt-10 reveal">
+                <a href="https://mball.cz/images/Matchball_projekt_digitalizace.pdf" class="font-syne text-xl md:text-3xl font-bold uppercase hover:text-electric transition-colors hover-target">DIGITALIZACE A AUTOMATIZACE INTERNÍCH PROCESŮ SPOLEČNOSTI MATCHBALL S.R.O.</a>
+                <p class="mt-4"><a href="https://mball.cz/images/Matchball_projekt_digitalizace.pdf" target="_blank" rel="noopener noreferrer" class="text-electric hover-target">Další info</a></p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER & CONTACTS -->
+    <footer id="contact" class="bg-[#020202] border-t border-electric/20 relative overflow-hidden">
+        <!-- Giant background text -->
+        <div class="absolute bottom-0 left-0 w-full text-center overflow-hidden pointer-events-none opacity-5" aria-hidden="true">
+            <span class="font-syne text-[15vw] font-black uppercase leading-none tracking-tighter">matchball</span>
+        </div>
+
+        <div class="contact-inner container mx-auto relative z-10 reveal">
+            <div class="contact-intro">
+                <div>
+                   <p>Matchball / kontakt</p>
+                   <h2>Pojďme to dát <span>do tisku.</span></h2>
+                </div>
+                <a href="mailto:tisk@mball.cz" class="contact-intro-link hover-target">Napište nám <span aria-hidden="true">↗</span></a>
+            </div>
+
+            <div class="contact-grid grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div class="contact-card">
+                   <h3 class="font-syne font-bold tracking-widest mb-6">Obchodní oddělení (kalkulace, technické dotazy)</h3>
+                   <div class="contact-person group hover-target">
+                        <p class="font-bold text-xl font-syne text-white group-hover:text-electric transition-colors">Jiří Rozsypálek</p>
+                        <p class="text-white/40 text-sm mb-1">jednatel,</p>
+                        <a href="mailto:jiri@mball.cz" class="text-white/70 block">jiri@mball.cz</a>
+                        <a href="tel:602547899" class="text-white/70 block">602547899,</a>
+                    </div>
+                   <div class="contact-person group hover-target">
+                        <p class="font-bold text-xl font-syne text-white group-hover:text-electric transition-colors">Jaromír Vaněček</p>
+                        <p class="text-white/40 text-sm mb-1">obchodní ředitel,</p>
+                        <a href="mailto:jaromir@mball.cz" class="text-white/70 block">jaromir@mball.cz.</a>
+                        <a href="tel:606038315" class="text-white/70 block">606038315,</a>
+                    </div>
+                </div>
+
+                <div class="contact-card">
+                   <h3 class="font-syne font-bold tracking-widest mb-6">Příjem zakázek (produkce, termíny, distribuce)</h3>
+                    <div class="space-y-6">
+                       <div class="contact-person group hover-target">
+                            <p class="font-bold text-xl font-syne text-white group-hover:text-electric transition-colors">Petra Bělejová</p>
+                            <a href="tel:724593384" class="text-white/70 block">724593384,</a>
+                            <a href="mailto:tisk@mball.cz" class="text-white/70 block">tisk@mball.cz</a>
+                        </div>
+                       <div class="contact-person group hover-target">
+                            <p class="font-bold text-xl font-syne text-white group-hover:text-electric transition-colors">Blanka Vitásková</p>
+                            <a href="tel:724120112" class="text-white/70 block">724120112,</a>
+                            <a href="mailto:blanka@mball.cz" class="text-white/70 block">blanka@mball.cz</a>
+                        </div>
+                       <div class="contact-person group hover-target">
+                            <p class="font-bold text-xl font-syne text-white group-hover:text-electric transition-colors">Hanka Sokolová</p>
+                            <a href="tel:603228131" class="text-white/70 block">603228131,</a>
+                            <a href="mailto:veronika@mball.cz" class="text-white/70 block">veronika@mball.cz</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="contact-card">
+                    <h3 class="font-syne font-bold tracking-widest mb-6">Kontakt a ceny</h3>
+                    <p class="text-white/70 font-sans leading-relaxed">
+                        MATCHBALL s.r.o.<br>
+                        Pod Zahrádkami 105, Napajedla, 76361
+                    </p>
+                    <a href="http://goo.gl/wMV3y" target="_blank" rel="noopener noreferrer" class="text-white/70 underline mt-3 inline-block hover-target">zobrazit na mapě</a>
+                </div>
+
+            </div>
+            
+            <div class="contact-bottom border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center text-white/60 text-sm">
+                <nav aria-label="Patička" class="flex flex-wrap justify-center gap-6">
+                    <a href="#top" class="transition-colors hover:text-electric hover-target">Úvod</a>
+                    <a href="#about" class="transition-colors hover:text-electric hover-target">Proč my</a>
+                    <a href="#contact" class="transition-colors hover:text-electric hover-target">Kontakt</a>
+                </nav>
+                <a href="https://www.facebook.com/pages/Agentura-Matchball/127053724034839" target="_blank" rel="noopener noreferrer" aria-label="matchball na facebooku" class="facebook-link mt-6 md:mt-0 inline-flex items-center gap-3 transition-colors hover:text-electric hover-target">
+                    <span aria-hidden="true" class="flex h-9 w-9 items-center justify-center rounded-full border border-white/20 font-syne text-lg font-bold">f</span>
+                    <span>matchball na facebooku</span>
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCRIPTS -->
+    <script>
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        const pageWipe = document.querySelector('.page-wipe');
+        let pageTransitionActive = false;
+
+        if (pageWipe) {
+            pageWipe.addEventListener('animationend', event => {
+                if (event.animationName === 'page-wipe-open') {
+                    pageWipe.classList.remove('is-intro');
+                }
+            });
+
+            document.addEventListener('click', event => {
+                const link = event.target instanceof Element ? event.target.closest('a[href^="#"]') : null;
+                if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank') {
+                    return;
+                }
+
+                const href = link.getAttribute('href');
+                const target = href ? document.getElementById(href.slice(1)) : null;
+                if (!target || reducedMotion.matches) {
+                    return;
+                }
+
+                event.preventDefault();
+                if (pageTransitionActive) {
+                    return;
+                }
+
+                pageTransitionActive = true;
+                pageWipe.classList.remove('is-intro', 'is-opening');
+                pageWipe.classList.add('is-covering');
+
+                window.setTimeout(() => {
+                    const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+                    document.documentElement.style.scrollBehavior = 'auto';
+                    target.scrollIntoView({ behavior: 'auto', block: 'start' });
+                    document.documentElement.style.scrollBehavior = previousScrollBehavior;
+
+                    if (window.location.hash !== href) {
+                        history.pushState(null, '', href);
+                    }
+
+                    pageWipe.classList.remove('is-covering');
+                    getComputedStyle(pageWipe).transform;
+                    pageWipe.classList.add('is-opening');
+
+                    window.setTimeout(() => {
+                        pageWipe.classList.remove('is-opening');
+                        pageTransitionActive = false;
+                    }, 750);
+                }, 570);
+            });
+        }
+
+        const scrollProgressBar = document.getElementById('scroll-progress-bar');
+        let scrollProgressFrame = null;
+
+        function updateScrollProgress() {
+            if (scrollProgressFrame !== null) {
+                return;
+            }
+
+            scrollProgressFrame = requestAnimationFrame(() => {
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                const progress = maxScroll > 0 ? Math.min(1, window.scrollY / maxScroll) : 0;
+                scrollProgressBar.style.transform = `scaleX(${progress})`;
+                scrollProgressFrame = null;
+            });
+        }
+
+        window.addEventListener('scroll', updateScrollProgress, { passive: true });
+        window.addEventListener('resize', updateScrollProgress, { passive: true });
+        updateScrollProgress();
+
+        // SCROLL-DRIVEN SERVICE RAIL
+        const serviceTabs = Array.from(document.querySelectorAll('[role="tab"]'));
+        const servicePanels = serviceTabs.map(tab => {
+            const panelId = tab.getAttribute('aria-controls');
+            const panel = panelId ? document.getElementById(panelId) : null;
+            if (!panel) {
+                throw new Error(`Missing service panel for tab "${tab.id}".`);
+            }
+            return panel;
+        });
+        const serviceScrollSpace = document.getElementById('service-scroll-space');
+        const serviceExperience = document.querySelector('.service-experience');
+        const serviceTrack = document.querySelector('.service-panels');
+        const workScrollSpace = document.getElementById('work');
+        const workTrack = document.querySelector('.work-grid');
+        const workCards = Array.from(document.querySelectorAll('.work-card'));
+        const workProgressValue = document.getElementById('work-progress-value');
+        let workUpdateFrame = null;
+
+        function updateWorkGallery() {
+            workUpdateFrame = null;
+            if (!workScrollSpace || !workTrack || window.matchMedia('(max-width: 768px)').matches) return;
+            const scrollRange = workScrollSpace.offsetHeight - window.innerHeight;
+            const progress = scrollRange > 0 ? Math.max(0, Math.min(1, -workScrollSpace.getBoundingClientRect().top / scrollRange)) : 0;
+            const travel = Math.max(0, workTrack.scrollWidth - window.innerWidth + window.innerWidth * 0.12);
+            workTrack.style.transform = `translate3d(${-travel * progress}px, 0, 0)`;
+            if (workProgressValue) workProgressValue.style.transform = `scaleX(${progress})`;
+            const activeIndex = Math.min(workCards.length - 1, Math.round(progress * (workCards.length - 1)));
+            workCards.forEach((card, index) => card.classList.toggle('is-current', index === activeIndex));
+        }
+
+        function scheduleWorkGalleryUpdate() {
+            if (workUpdateFrame === null) workUpdateFrame = requestAnimationFrame(updateWorkGallery);
+        }
+        window.addEventListener('scroll', scheduleWorkGalleryUpdate, { passive: true });
+        window.addEventListener('resize', scheduleWorkGalleryUpdate, { passive: true });
+        scheduleWorkGalleryUpdate();
+        let activeServiceIndex = -1;
+        let serviceUpdateFrame = null;
+
+        function setActiveService(index, moveFocus) {
+            if (index < 0 || index >= serviceTabs.length || index === activeServiceIndex) {
+                if (moveFocus && serviceTabs[index]) {
+                    serviceTabs[index].focus();
+                }
+                return;
+            }
+
+            activeServiceIndex = index;
+            serviceTabs.forEach((tab, tabIndex) => {
+                const isActive = tabIndex === index;
+                const panel = servicePanels[tabIndex];
+                tab.setAttribute('aria-selected', String(isActive));
+                tab.tabIndex = isActive ? 0 : -1;
+                tab.classList.toggle('is-active', isActive);
+                panel.setAttribute('aria-hidden', String(!isActive));
+                panel.inert = !isActive;
+                panel.tabIndex = isActive ? 0 : -1;
+                panel.classList.toggle('is-active', isActive);
+            });
+
+            if (moveFocus) {
+                serviceTabs[index].focus();
+            }
+        }
+
+        function scrollToService(index) {
+            if (window.matchMedia('(max-width: 768px)').matches) {
+                const panel = servicePanels[index];
+                const distance = panel.getBoundingClientRect().left - serviceTrack.getBoundingClientRect().left;
+                serviceTrack.scrollTo({
+                    left: serviceTrack.scrollLeft + distance,
+                    behavior: reducedMotion.matches ? 'auto' : 'smooth'
+                });
+                return;
+            }
+
+            const scrollRange = serviceScrollSpace.offsetHeight - serviceExperience.offsetHeight;
+            const progress = serviceTabs.length > 1 ? index / (serviceTabs.length - 1) : 0;
+            const targetTop = window.scrollY + serviceScrollSpace.getBoundingClientRect().top + scrollRange * progress;
+            const previousScrollBehavior = document.documentElement.style.scrollBehavior;
+            document.documentElement.style.scrollBehavior = 'auto';
+            window.scrollTo({ top: targetTop, behavior: 'auto' });
+            document.documentElement.style.scrollBehavior = previousScrollBehavior;
+        }
+
+        serviceTabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                setActiveService(index, false);
+                scrollToService(index);
+            });
+            tab.addEventListener('keydown', event => {
+                let nextIndex = index;
+
+                if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+                    nextIndex = (index + 1) % serviceTabs.length;
+                } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+                    nextIndex = (index - 1 + serviceTabs.length) % serviceTabs.length;
+                } else if (event.key === 'Home') {
+                    nextIndex = 0;
+                } else if (event.key === 'End') {
+                    nextIndex = serviceTabs.length - 1;
+                } else {
+                    return;
+                }
+
+                event.preventDefault();
+                setActiveService(nextIndex, true);
+                scrollToService(nextIndex);
+            });
+        });
+
+        function updateServiceRail() {
+            serviceUpdateFrame = null;
+            if (!serviceTabs.length) {
+                return;
+            }
+
+            if (window.matchMedia('(max-width: 768px)').matches) {
+                const trackLeft = serviceTrack.getBoundingClientRect().left;
+                let nearestIndex = 0;
+                let nearestDistance = Infinity;
+
+                servicePanels.forEach((panel, index) => {
+                    const distance = Math.abs(panel.getBoundingClientRect().left - trackLeft);
+                    if (distance < nearestDistance) {
+                        nearestDistance = distance;
+                        nearestIndex = index;
+                    }
+                });
+
+                setActiveService(nearestIndex, false);
+                return;
+            }
+
+            const scrollRange = serviceScrollSpace.offsetHeight - serviceExperience.offsetHeight;
+            if (scrollRange <= 0) {
+                setActiveService(0, false);
+                return;
+            }
+
+            const progress = Math.max(0, Math.min(1, -serviceScrollSpace.getBoundingClientRect().top / scrollRange));
+            const maxTravel = Math.max(0, serviceTrack.scrollWidth - serviceExperience.clientWidth);
+            serviceTrack.style.transform = `translate3d(${-maxTravel * progress}px, 0, 0)`;
+            servicePanels.forEach((panel, index) => panel.style.setProperty('--service-progress', String(Math.max(0, 1 - Math.abs(progress * (serviceTabs.length - 1) - index)))));
+
+            const activeIndex = Math.round(progress * (serviceTabs.length - 1));
+            setActiveService(activeIndex, false);
+        }
+
+        function scheduleServiceRailUpdate() {
+            if (serviceUpdateFrame === null) {
+                serviceUpdateFrame = requestAnimationFrame(updateServiceRail);
+            }
+        }
+
+        if (serviceTabs.length > 0) {
+            const initiallySelected = serviceTabs.findIndex(tab => tab.getAttribute('aria-selected') === 'true');
+            setActiveService(Math.max(0, initiallySelected), false);
+            window.addEventListener('scroll', scheduleServiceRailUpdate, { passive: true });
+            window.addEventListener('resize', scheduleServiceRailUpdate, { passive: true });
+            serviceTrack.addEventListener('scroll', scheduleServiceRailUpdate, { passive: true });
+            scheduleServiceRailUpdate();
+        }
+
+        // 3. SCROLL REVEAL ANIMATIONS (Intersection Observer)
+        const revealElements = document.querySelectorAll('.reveal');
+        
+        const revealOptions = {
+            threshold: 0.15,
+            rootMargin: "0px 0px -50px 0px"
+        };
+
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target); // Reveal only once
+                }
+            });
+        }, revealOptions);
+
+        revealElements.forEach(el => {
+            revealObserver.observe(el);
+        });
+        document.documentElement.classList.add('motion-ready');
+
+    </script>
+</body>
+</html>
